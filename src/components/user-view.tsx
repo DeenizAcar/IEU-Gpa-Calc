@@ -1,0 +1,268 @@
+"use client";
+
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { GradeCard } from "@/components/grade-card";
+import { GPASummary } from "@/components/gpa-summary";
+import { GradeScaleReference } from "@/components/grade-scale-reference";
+import { AdminState, CourseGrade } from "@/lib/types";
+import {
+  COURSES,
+  SEMESTER_LABELS,
+  SEMESTERS,
+  getCoursesBySemester,
+} from "@/lib/course-data";
+import {
+  loadAdminState,
+  loadStudentState,
+  saveStudentState,
+  resetStudentState,
+} from "@/lib/storage";
+import {
+  calculateCourseGrade,
+  calculateCumulativeGPA,
+  calculateSemesterGPA,
+} from "@/lib/calculator-logic";
+import {
+  Trash2,
+  AlertTriangle,
+  BookOpen,
+  GraduationCap,
+} from "lucide-react";
+
+export function UserView() {
+  const [adminState, setAdminState] = useState<AdminState | null>(null);
+  const [scores, setScores] = useState<Record<string, Record<string, number>>>({});
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
+
+  // Load persisted data on mount
+  useEffect(() => {
+    const admin = loadAdminState();
+    const student = loadStudentState();
+    setAdminState(admin);
+
+    // Reconstruct scores from student state
+    const reconstructed: Record<string, Record<string, number>> = {};
+    for (const [courseId, grade] of Object.entries(student.courseGrades)) {
+      reconstructed[courseId] = { ...grade.scores };
+    }
+    setScores(reconstructed);
+  }, []);
+
+  // Save whenever scores change
+  useEffect(() => {
+    if (!adminState) return;
+
+    const courseGrades: Record<string, CourseGrade> = {};
+    for (const [courseId, courseScores] of Object.entries(scores)) {
+      const config = adminState.courseConfigs[courseId];
+      if (!config) continue;
+      const hasScore = Object.values(courseScores).some((s) => s > 0);
+      if (!hasScore) continue;
+      courseGrades[courseId] = calculateCourseGrade(courseId, courseScores, config);
+    }
+
+    saveStudentState({ courseGrades, selectedElectives: [] });
+  }, [scores, adminState]);
+
+  const handleScoreChange = useCallback(
+    (courseId: string, fieldId: string, value: number) => {
+      setScores((prev) => ({
+        ...prev,
+        [courseId]: {
+          ...(prev[courseId] || {}),
+          [fieldId]: value,
+        },
+      }));
+    },
+    []
+  );
+
+  const handleReset = useCallback(() => {
+    resetStudentState();
+    setScores({});
+    setResetDialogOpen(false);
+  }, []);
+
+  // ─── Computed GPA values ───────────────────────────────────────────
+  const allGrades = useMemo(() => {
+    if (!adminState) return [];
+    const grades: CourseGrade[] = [];
+    for (const [courseId, courseScores] of Object.entries(scores)) {
+      const config = adminState.courseConfigs[courseId];
+      if (!config) continue;
+      const hasScore = Object.values(courseScores).some((s) => s > 0);
+      if (!hasScore) continue;
+      grades.push(calculateCourseGrade(courseId, courseScores, config));
+    }
+    return grades;
+  }, [scores, adminState]);
+
+  const { gpa: cumulativeGPA, totalCredits } = useMemo(
+    () => calculateCumulativeGPA(allGrades),
+    [allGrades]
+  );
+
+  const semesterGPAs = useMemo(() => {
+    return SEMESTERS.map((sem) => {
+      const semGrades = allGrades.filter((g) => {
+        const course = COURSES.find((c) => c.id === g.courseId);
+        return course?.semester === sem;
+      });
+      return {
+        semester: sem,
+        gpa: calculateSemesterGPA(semGrades),
+        count: semGrades.length,
+      };
+    }).filter((s) => s.count > 0);
+  }, [allGrades]);
+
+  if (!adminState) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-pulse text-muted-foreground">Loading…</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <GraduationCap className="h-6 w-6" />
+            Grade Calculator
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Enter your scores to calculate grades and GPA instantly.
+          </p>
+        </div>
+        <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-11 min-h-[44px]"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Clear All Scores
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                Clear All Scores?
+              </DialogTitle>
+              <DialogDescription>
+                This will remove all entered scores. This action cannot be
+                undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setResetDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleReset}>
+                Clear All
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* GPA Summary */}
+      <GPASummary
+        cumulativeGPA={cumulativeGPA}
+        totalCredits={totalCredits}
+        completedCourses={allGrades.length}
+        semesterGPAs={semesterGPAs}
+      />
+
+      {/* Grade Scale Reference */}
+      <GradeScaleReference />
+
+      {/* Semester Tabs */}
+      <Tabs defaultValue="1.1" className="w-full">
+        <TabsList className="w-full grid grid-cols-4 h-12">
+          {SEMESTERS.map((sem) => (
+            <TabsTrigger
+              key={sem}
+              value={sem}
+              className="min-h-[44px] text-sm data-[state=active]:font-bold"
+            >
+              <span className="hidden sm:inline">{SEMESTER_LABELS[sem]?.split("—")[0]}</span>
+              <span className="sm:hidden">{sem}</span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+
+        {SEMESTERS.map((sem) => {
+          const semCourses = getCoursesBySemester(sem);
+          const semGrades = allGrades.filter((g) => {
+            const course = COURSES.find((c) => c.id === g.courseId);
+            return course?.semester === sem;
+          });
+          const semGPA = calculateSemesterGPA(semGrades);
+
+          return (
+            <TabsContent key={sem} value={sem} className="space-y-4 mt-4">
+              {/* Semester Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">{SEMESTER_LABELS[sem]}</h3>
+                </div>
+                {semGrades.length > 0 && (
+                  <span className="text-sm font-mono text-muted-foreground">
+                    Semester GPA:{" "}
+                    <strong className="text-foreground">{semGPA.toFixed(2)}</strong>
+                  </span>
+                )}
+              </div>
+
+              {/* Course Grade Cards */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {semCourses.map((course) => {
+                  const config = adminState.courseConfigs[course.id];
+                  if (!config) return null;
+
+                  // Only show if admin has configured at least one weight > 0
+                  const hasActiveWeights = config.weights.some(
+                    (w) => w.percentage > 0
+                  );
+                  if (!hasActiveWeights) return null;
+
+                  return (
+                    <GradeCard
+                      key={course.id}
+                      course={course}
+                      weights={config.weights}
+                      scores={scores[course.id] || {}}
+                      cumulativeGPA={cumulativeGPA}
+                      onScoreChange={handleScoreChange}
+                    />
+                  );
+                })}
+              </div>
+            </TabsContent>
+          );
+        })}
+      </Tabs>
+    </div>
+  );
+}
