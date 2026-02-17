@@ -8,15 +8,18 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useLanguage } from "@/components/language-provider";
 
 export function GradeScaleReference() {
+  const { t } = useLanguage();
+
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value="grade-scale" className="border rounded-lg px-4">
         <AccordionTrigger className="hover:no-underline py-3">
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-semibold">IUE Grading Scale</span>
+            <span className="text-sm font-semibold">{t.gradingScale}</span>
           </div>
         </AccordionTrigger>
         <AccordionContent>
@@ -43,8 +46,7 @@ export function GradeScaleReference() {
             ))}
           </div>
           <p className="text-xs text-muted-foreground mt-2 mb-1 leading-relaxed">
-            <strong>Note:</strong> DC (1.5) and DD (1.0) grades require a
-            cumulative GPA of ≥ 2.00 to pass. FD and FF are automatic failures.
+            {t.gradingScaleNote}
           </p>
         </AccordionContent>
       </AccordionItem>

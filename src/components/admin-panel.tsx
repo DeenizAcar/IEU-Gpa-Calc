@@ -23,7 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AdminState, WeightField } from "@/lib/types";
-import { COURSES, SEMESTER_LABELS, SEMESTERS, ELECTIVE_COURSES } from "@/lib/course-data";
+import { COURSES, SEMESTERS, ELECTIVE_COURSES, getSemesterLabel } from "@/lib/course-data";
 import { loadAdminState, saveAdminState, resetAdminState } from "@/lib/storage";
 import {
   Plus,
@@ -37,8 +37,10 @@ import {
   CheckCircle,
   BookOpen,
 } from "lucide-react";
+import { useLanguage } from "@/components/language-provider";
 
 export function AdminPanel() {
+  const { language, t } = useLanguage();
   const [adminState, setAdminState] = useState<AdminState | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
@@ -155,10 +157,13 @@ export function AdminPanel() {
     []
   );
 
+  const getCourseName = (course: { name: string; nameTr: string }) =>
+    language === "tr" ? course.nameTr : course.name;
+
   if (!adminState) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-pulse text-muted-foreground">Loading…</div>
+        <div className="animate-pulse text-muted-foreground">{t.loading}</div>
       </div>
     );
   }
@@ -172,18 +177,18 @@ export function AdminPanel() {
             <div className="mx-auto mb-3 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
               <Lock className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle>Admin Access</CardTitle>
+            <CardTitle>{t.adminAccess}</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              Enter the password to configure course weights.
+              {t.adminAccessDesc}
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="admin-password">Password</Label>
+              <Label htmlFor="admin-password">{t.password}</Label>
               <Input
                 id="admin-password"
                 type="password"
-                placeholder="Enter admin password"
+                placeholder={t.enterPassword}
                 value={passwordInput}
                 onChange={(e) => {
                   setPasswordInput(e.target.value);
@@ -195,7 +200,7 @@ export function AdminPanel() {
               />
               {passwordError && (
                 <p className="text-sm text-red-500 mt-1" role="alert">
-                  Incorrect password. Try again.
+                  {t.incorrectPassword}
                 </p>
               )}
             </div>
@@ -204,10 +209,10 @@ export function AdminPanel() {
               className="w-full h-11 min-h-[44px]"
             >
               <Unlock className="h-4 w-4 mr-2" />
-              Unlock Admin Panel
+              {t.unlockAdmin}
             </Button>
             <p className="text-xs text-muted-foreground text-center">
-              Default password: <code className="bg-muted px-1 py-0.5 rounded">admin123</code>
+              {t.defaultPassword}: <code className="bg-muted px-1 py-0.5 rounded">admin123</code>
             </p>
           </CardContent>
         </Card>
@@ -223,11 +228,10 @@ export function AdminPanel() {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Settings className="h-6 w-6" />
-            Course Weight Configuration
+            {t.courseWeightConfig}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Set grading weight percentages for each course. Fields with 0% are
-            hidden from students.
+            {t.courseWeightConfigDesc}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -239,18 +243,17 @@ export function AdminPanel() {
                 className="h-11 min-h-[44px]"
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
-                Reset All
+                {t.resetAll}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
                   <AlertTriangle className="h-5 w-5 text-destructive" />
-                  Reset All Configurations?
+                  {t.resetAllConfirm}
                 </DialogTitle>
                 <DialogDescription>
-                  This will restore all course weights to their default values.
-                  This action cannot be undone.
+                  {t.resetAllDesc}
                 </DialogDescription>
               </DialogHeader>
               <DialogFooter>
@@ -258,10 +261,10 @@ export function AdminPanel() {
                   variant="outline"
                   onClick={() => setResetDialogOpen(false)}
                 >
-                  Cancel
+                  {t.cancel}
                 </Button>
                 <Button variant="destructive" onClick={handleReset}>
-                  Reset All
+                  {t.resetAll}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -274,12 +277,12 @@ export function AdminPanel() {
             {saveStatus === "saved" ? (
               <>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Saved!
+                {t.saved}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Save Configuration
+                {t.saveConfig}
               </>
             )}
           </Button>
@@ -303,10 +306,10 @@ export function AdminPanel() {
                   <BookOpen className="h-5 w-5 text-primary" />
                   <div className="text-left">
                     <span className="font-semibold">
-                      {SEMESTER_LABELS[semester]}
+                      {getSemesterLabel(semester, language)}
                     </span>
                     <span className="text-sm text-muted-foreground ml-2">
-                      ({semesterCourses.length} courses)
+                      ({semesterCourses.length} {t.courses})
                     </span>
                   </div>
                 </div>
@@ -329,16 +332,16 @@ export function AdminPanel() {
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <CardTitle className="text-base">
-                                {course.name}
+                                {getCourseName(course)}
                               </CardTitle>
                               <p className="text-xs text-muted-foreground">
-                                {course.code} • {course.credits} cr
+                                {course.code} • {course.credits} {t.creditAbbr}
                                 {course.isElective && (
                                   <Badge
                                     variant="secondary"
                                     className="ml-2 text-[10px]"
                                   >
-                                    Elective
+                                    {t.elective}
                                   </Badge>
                                 )}
                               </p>
@@ -355,16 +358,16 @@ export function AdminPanel() {
                                 size="sm"
                                 onClick={() => applyToAll(course.id)}
                                 className="text-xs h-8 min-h-[44px] min-w-[44px]"
-                                title="Apply these weights to all courses"
+                                title={t.applyToAllTitle}
                               >
-                                Apply to All
+                                {t.applyToAll}
                               </Button>
                             </div>
                           </div>
                           {!isValid && totalWeight > 0 && (
                             <p className="text-xs text-destructive flex items-center gap-1 mt-1">
                               <AlertTriangle className="h-3 w-3" />
-                              Weights must sum to 100% (currently {totalWeight}%)
+                              {t.weightsMustSum.replace("{value}", String(totalWeight))}
                             </p>
                           )}
                         </CardHeader>
@@ -375,7 +378,7 @@ export function AdminPanel() {
                               className="grid grid-cols-[1fr_1fr_80px_40px] gap-2 items-end"
                             >
                               <div>
-                                <Label className="text-xs">Label (EN)</Label>
+                                <Label className="text-xs">{t.labelEN}</Label>
                                 <Input
                                   value={weight.label}
                                   onChange={(e) =>
@@ -391,7 +394,7 @@ export function AdminPanel() {
                                 />
                               </div>
                               <div>
-                                <Label className="text-xs">Label (TR)</Label>
+                                <Label className="text-xs">{t.labelTR}</Label>
                                 <Input
                                   value={weight.labelTr}
                                   onChange={(e) =>
@@ -407,7 +410,7 @@ export function AdminPanel() {
                                 />
                               </div>
                               <div>
-                                <Label className="text-xs">Weight %</Label>
+                                <Label className="text-xs">{t.weightPercent}</Label>
                                 <Input
                                   type="number"
                                   min={0}
@@ -444,7 +447,7 @@ export function AdminPanel() {
                             className="w-full h-9 min-h-[44px] mt-2"
                           >
                             <Plus className="h-4 w-4 mr-2" />
-                            Add Custom Field
+                            {t.addCustomField}
                           </Button>
                         </CardContent>
                       </Card>
@@ -465,9 +468,9 @@ export function AdminPanel() {
             <div className="flex items-center gap-3">
               <BookOpen className="h-5 w-5 text-primary" />
               <div className="text-left">
-                <span className="font-semibold">Elective Course Pool</span>
+                <span className="font-semibold">{t.electiveCoursePool}</span>
                 <span className="text-sm text-muted-foreground ml-2">
-                  ({ELECTIVE_COURSES.length} courses)
+                  ({ELECTIVE_COURSES.length} {t.courses})
                 </span>
               </div>
             </div>
@@ -478,13 +481,13 @@ export function AdminPanel() {
                 <Card key={course.id} className="border p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-sm">{course.name}</p>
+                      <p className="font-medium text-sm">{getCourseName(course)}</p>
                       <p className="text-xs text-muted-foreground">
-                        {course.code} • {course.credits} credits
+                        {course.code} • {course.credits} {t.credits}
                       </p>
                     </div>
                     <Badge variant="outline" className="text-xs">
-                      {course.nameTr}
+                      {language === "tr" ? course.name : course.nameTr}
                     </Badge>
                   </div>
                 </Card>

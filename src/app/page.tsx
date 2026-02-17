@@ -4,9 +4,11 @@ import { useState } from "react";
 import { AppHeader } from "@/components/app-header";
 import { UserView } from "@/components/user-view";
 import { AdminPanel } from "@/components/admin-panel";
+import { useLanguage } from "@/components/language-provider";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<"student" | "admin">("student");
+  const { t } = useLanguage();
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -18,7 +20,7 @@ export default function Home() {
 
       <footer className="border-t py-4">
         <div className="container max-w-6xl mx-auto px-4 text-center text-sm text-muted-foreground">
-          Deniz Acar |{" "}
+          {t.footerText} |{" "}
           <a
             href="mailto:2008denizacar@gmail.com"
             className="hover:text-foreground transition-colors"

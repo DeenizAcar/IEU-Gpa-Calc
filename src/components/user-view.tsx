@@ -18,9 +18,9 @@ import { GradeScaleReference } from "@/components/grade-scale-reference";
 import { AdminState, CourseGrade } from "@/lib/types";
 import {
   COURSES,
-  SEMESTER_LABELS,
   SEMESTERS,
   getCoursesBySemester,
+  getSemesterLabel,
 } from "@/lib/course-data";
 import {
   loadAdminState,
@@ -39,8 +39,10 @@ import {
   BookOpen,
   GraduationCap,
 } from "lucide-react";
+import { useLanguage } from "@/components/language-provider";
 
 export function UserView() {
+  const { language, t } = useLanguage();
   const [adminState, setAdminState] = useState<AdminState | null>(null);
   const [scores, setScores] = useState<Record<string, Record<string, number>>>({});
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
@@ -120,17 +122,17 @@ export function UserView() {
         return course?.semester === sem;
       });
       return {
-        semester: sem,
+        semester: getSemesterLabel(sem, language),
         gpa: calculateSemesterGPA(semGrades),
         count: semGrades.length,
       };
     }).filter((s) => s.count > 0);
-  }, [allGrades]);
+  }, [allGrades, language]);
 
   if (!adminState) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="animate-pulse text-muted-foreground">Loading…</div>
+        <div className="animate-pulse text-muted-foreground">{t.loading}</div>
       </div>
     );
   }
@@ -142,10 +144,10 @@ export function UserView() {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <GraduationCap className="h-6 w-6" />
-            Grade Calculator
+            {t.gradeCalculator}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Enter your scores to calculate grades and GPA instantly.
+            {t.gradeCalculatorDesc}
           </p>
         </div>
         <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
@@ -156,18 +158,17 @@ export function UserView() {
               className="h-11 min-h-[44px]"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Clear All Scores
+              {t.clearAllScores}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
-                Clear All Scores?
+                {t.clearAllScoresConfirm}
               </DialogTitle>
               <DialogDescription>
-                This will remove all entered scores. This action cannot be
-                undone.
+                {t.clearAllScoresDesc}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -175,10 +176,10 @@ export function UserView() {
                 variant="outline"
                 onClick={() => setResetDialogOpen(false)}
               >
-                Cancel
+                {t.cancel}
               </Button>
               <Button variant="destructive" onClick={handleReset}>
-                Clear All
+                {t.clearAll}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -205,7 +206,7 @@ export function UserView() {
               value={sem}
               className="min-h-[44px] px-2 py-2.5 text-xs sm:text-sm font-medium text-center leading-tight whitespace-normal rounded-md data-[state=active]:font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
             >
-              {SEMESTER_LABELS[sem]}
+              {getSemesterLabel(sem, language)}
             </TabsTrigger>
           ))}
         </TabsList>
@@ -224,11 +225,11 @@ export function UserView() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold">{SEMESTER_LABELS[sem]}</h3>
+                  <h3 className="font-semibold">{getSemesterLabel(sem, language)}</h3>
                 </div>
                 {semGrades.length > 0 && (
                   <span className="text-sm font-mono text-muted-foreground">
-                    Semester GPA:{" "}
+                    {t.semesterGPA}:{" "}
                     <strong className="text-foreground">{semGPA.toFixed(2)}</strong>
                   </span>
                 )}

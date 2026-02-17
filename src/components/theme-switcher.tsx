@@ -9,25 +9,30 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLanguage } from "@/components/language-provider";
+import type { Translations } from "@/lib/i18n";
 
-const themes = [
-  { value: "dark", label: "Dark Mode", icon: Moon },
-  { value: "light", label: "Light Mode", icon: Sun },
-  { value: "high-contrast", label: "High Contrast", icon: Contrast },
-] as const;
+const getThemes = (t: Translations) => [
+  { value: "dark" as const, label: t.darkMode, icon: Moon },
+  { value: "light" as const, label: t.lightMode, icon: Sun },
+  { value: "high-contrast" as const, label: t.highContrast, icon: Contrast },
+];
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => setMounted(true), []);
+
+  const themes = getThemes(t);
 
   if (!mounted) {
     return (
       <div className="flex gap-1">
-        {themes.map((t) => (
+        {themes.map((th) => (
           <div
-            key={t.value}
+            key={th.value}
             className="h-11 w-11 rounded-md bg-muted animate-pulse"
           />
         ))}
@@ -36,19 +41,19 @@ export function ThemeSwitcher() {
   }
 
   return (
-    <div className="flex gap-1" role="radiogroup" aria-label="Theme selector">
-      {themes.map((t) => {
-        const Icon = t.icon;
-        const isActive = theme === t.value;
+    <div className="flex gap-1" role="radiogroup" aria-label={t.themeSelector}>
+      {themes.map((th) => {
+        const Icon = th.icon;
+        const isActive = theme === th.value;
         return (
-          <Tooltip key={t.value}>
+          <Tooltip key={th.value}>
             <TooltipTrigger asChild>
               <Button
                 variant={isActive ? "default" : "outline"}
                 size="icon"
                 className="h-11 w-11 min-w-[44px] min-h-[44px] transition-all duration-200 active:scale-95"
-                onClick={() => setTheme(t.value)}
-                aria-label={t.label}
+                onClick={() => setTheme(th.value)}
+                aria-label={th.label}
                 aria-checked={isActive}
                 role="radio"
               >
@@ -56,7 +61,7 @@ export function ThemeSwitcher() {
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{t.label}</p>
+              <p>{th.label}</p>
             </TooltipContent>
           </Tooltip>
         );

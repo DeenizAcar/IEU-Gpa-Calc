@@ -372,12 +372,18 @@ export const ELECTIVE_COURSES: Course[] = [
 ];
 
 // ─── Semester Labels ──────────────────────────────────────────────────
-export const SEMESTER_LABELS: Record<string, string> = {
-  "1.1": "1. Sene 1. D\u00f6nem",
-  "1.2": "1. Sene 2. D\u00f6nem",
-  "2.1": "2. Sene 1. D\u00f6nem",
-  "2.2": "2. Sene 2. D\u00f6nem",
+import type { Language } from "./i18n";
+
+export const SEMESTER_LABELS: Record<string, Record<Language, string>> = {
+  "1.1": { tr: "1. Sene 1. Dönem", en: "Year 1 Fall" },
+  "1.2": { tr: "1. Sene 2. Dönem", en: "Year 1 Spring" },
+  "2.1": { tr: "2. Sene 1. Dönem", en: "Year 2 Fall" },
+  "2.2": { tr: "2. Sene 2. Dönem", en: "Year 2 Spring" },
 };
+
+export function getSemesterLabel(semester: string, language: Language): string {
+  return SEMESTER_LABELS[semester]?.[language] ?? semester;
+}
 
 export const SEMESTERS = ["1.1", "1.2", "2.1", "2.2"] as const;
 

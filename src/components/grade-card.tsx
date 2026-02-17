@@ -20,6 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLanguage } from "@/components/language-provider";
 
 interface GradeCardProps {
   course: Course;
@@ -36,6 +37,8 @@ export function GradeCard({
   cumulativeGPA,
   onScoreChange,
 }: GradeCardProps) {
+  const { language, t } = useLanguage();
+
   // Only show weights with percentage > 0
   const activeWeights = weights.filter((w) => w.percentage > 0);
   const weightedAvg = calculateWeightedAverage(scores, weights);
@@ -45,6 +48,8 @@ export function GradeCard({
   const gradeColor = getGradeColor(letter);
 
   const hasAnyScore = Object.values(scores).some((s) => s > 0);
+
+  const courseName = language === "tr" ? course.nameTr : course.name;
 
   const handleInputChange = useCallback(
     (fieldId: string, value: string) => {
@@ -61,6 +66,14 @@ export function GradeCard({
     [course.id, onScoreChange]
   );
 
+  const getWeightLabel = (weight: WeightField) =>
+    language === "tr" ? weight.labelTr : weight.label;
+
+  const getWeightTooltip = (weight: WeightField) =>
+    language === "tr"
+      ? `${weight.label} — %${weight.percentage} ${t.weight}`
+      : `${weight.labelTr} — ${weight.percentage}% ${t.weight}`;
+
   return (
     <Card
       className={`transition-all duration-300 hover:shadow-lg border-2 ${
@@ -75,10 +88,10 @@ export function GradeCard({
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-base sm:text-lg leading-tight">
-              {course.name}
+              {courseName}
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
-              {course.code} • {course.credits} Credits
+              {course.code} • {course.credits} {t.credits}
             </p>
           </div>
           {hasAnyScore && (
@@ -100,7 +113,7 @@ export function GradeCard({
                     passed ? "text-green-500" : "text-red-500"
                   }`}
                 >
-                  {passed ? "Passed" : "Failed"}
+                  {passed ? t.passed : t.failed}
                 </span>
               </div>
             </div>
@@ -115,7 +128,7 @@ export function GradeCard({
                 htmlFor={`${course.id}-${weight.id}`}
                 className="text-sm font-medium flex items-center gap-1.5"
               >
-                {weight.label}
+                {getWeightLabel(weight)}
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="text-muted-foreground cursor-help">
@@ -123,9 +136,7 @@ export function GradeCard({
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      {weight.labelTr} — {weight.percentage}% weight
-                    </p>
+                    <p>{getWeightTooltip(weight)}</p>
                   </TooltipContent>
                 </Tooltip>
               </Label>
@@ -141,7 +152,7 @@ export function GradeCard({
                 min={0}
                 step={1}
                 className="flex-1"
-                aria-label={`${weight.label} score for ${course.name}`}
+                aria-label={`${getWeightLabel(weight)} - ${courseName}`}
               />
               <Input
                 id={`${course.id}-${weight.id}`}
@@ -151,7 +162,7 @@ export function GradeCard({
                 value={scores[weight.id] ?? 0}
                 onChange={(e) => handleInputChange(weight.id, e.target.value)}
                 className="w-16 h-11 min-h-[44px] text-center font-mono tabular-nums"
-                aria-label={`${weight.label} score for ${course.name}`}
+                aria-label={`${getWeightLabel(weight)} - ${courseName}`}
               />
             </div>
           </div>
@@ -161,7 +172,7 @@ export function GradeCard({
           <div className="pt-3 border-t flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Calculator className="h-4 w-4 text-muted-foreground" />
-              <span>Weighted Average</span>
+              <span>{t.weightedAverage}</span>
             </div>
             <span
               className="text-lg font-bold font-mono tabular-nums"

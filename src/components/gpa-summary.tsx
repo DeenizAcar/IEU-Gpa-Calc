@@ -1,8 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { getGPAColor, getGPALabel } from "@/lib/calculator-logic";
+import { getGPAColor, getGPALabelKey } from "@/lib/calculator-logic";
 import { GraduationCap, TrendingUp, BookOpen, Target } from "lucide-react";
+import { useLanguage } from "@/components/language-provider";
+import type { Translations } from "@/lib/i18n";
 
 interface GPASummaryProps {
   cumulativeGPA: number;
@@ -17,34 +19,36 @@ export function GPASummary({
   completedCourses,
   semesterGPAs,
 }: GPASummaryProps) {
+  const { t } = useLanguage();
   const gpaColor = getGPAColor(cumulativeGPA);
-  const gpaLabel = getGPALabel(cumulativeGPA);
+  const gpaLabelKey = getGPALabelKey(cumulativeGPA) as keyof Translations;
+  const gpaLabel = t[gpaLabelKey] as string;
 
   const stats = [
     {
       icon: GraduationCap,
-      label: "Cumulative GPA",
+      label: t.cumulativeGPA,
       value: cumulativeGPA.toFixed(2),
       color: gpaColor,
       subtext: gpaLabel,
     },
     {
       icon: BookOpen,
-      label: "Total Credits",
+      label: t.totalCredits,
       value: totalCredits.toString(),
       color: "#3b82f6",
-      subtext: "credit hours",
+      subtext: t.creditHours,
     },
     {
       icon: Target,
-      label: "Courses Graded",
+      label: t.coursesGraded,
       value: completedCourses.toString(),
       color: "#8b5cf6",
-      subtext: "courses",
+      subtext: t.courses,
     },
     {
       icon: TrendingUp,
-      label: "Best Semester",
+      label: t.bestSemester,
       value:
         semesterGPAs.length > 0
           ? Math.max(...semesterGPAs.map((s) => s.gpa)).toFixed(2)
