@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Accordion,
   AccordionContent,
@@ -50,10 +51,17 @@ export function AdminPanel() {
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "error">("idle");
   const [exportStatus, setExportStatus] = useState<"idle" | "copied">("idle");
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  // Load on mount
+  // Load on mount + auto-auth if remembered
   useEffect(() => {
-    setAdminState(loadAdminState());
+    const state = loadAdminState();
+    setAdminState(state);
+    const remembered = localStorage.getItem("ieu-admin-remember");
+    if (remembered === "true") {
+      setIsAuthenticated(true);
+      setRememberMe(true);
+    }
   }, []);
 
   const handleAuthenticate = useCallback(() => {
@@ -61,10 +69,15 @@ export function AdminPanel() {
     if (passwordInput === adminState.password) {
       setIsAuthenticated(true);
       setPasswordError(false);
+      if (rememberMe) {
+        localStorage.setItem("ieu-admin-remember", "true");
+      } else {
+        localStorage.removeItem("ieu-admin-remember");
+      }
     } else {
       setPasswordError(true);
     }
-  }, [passwordInput, adminState]);
+  }, [passwordInput, adminState, rememberMe]);
 
   const handleSave = useCallback(() => {
     if (!adminState) return;
@@ -86,6 +99,27 @@ export function AdminPanel() {
     setTimeout(() => setSaveStatus("idle"), 2000);
   }, []);
 
+  const handleCourseNameChange = useCallback(
+    (courseId: string, field: "name" | "nameTr" | "code", value: string) => {
+      setAdminState((prev) => {
+        if (!prev) return prev;
+        const existing = prev.courseNameOverrides[courseId] || {
+          name: COURSES.find((c) => c.id === courseId)?.name || "",
+          nameTr: COURSES.find((c) => c.id === courseId)?.nameTr || "",
+          code: COURSES.find((c) => c.id === courseId)?.code || "",
+        };
+        return {
+          ...prev,
+          courseNameOverrides: {
+            ...prev.courseNameOverrides,
+            [courseId]: { ...existing, [field]: value },
+          },
+        };
+      });
+    },
+    []
+  );
+
   const handleExportConfig = useCallback(() => {
     if (!adminState) return;
     const exportData: Record<string, { weights: WeightField[] }> = {};
@@ -99,7 +133,11 @@ export function AdminPanel() {
         })),
       };
     }
-    const json = JSON.stringify(exportData, null, 2);
+    const exportPayload = {
+      courseConfigs: exportData,
+      courseNameOverrides: adminState.courseNameOverrides,
+    };
+    const json = JSON.stringify(exportPayload, null, 2);
     const prompt = `I have updated the course configurations in the Admin Panel. Please update the \`course-data.ts\` file and set the following JSON as the NEW DEFAULT values for all users:\n\n${json}`;
     navigator.clipboard.writeText(prompt).then(() => {
       setExportStatus("copied");
@@ -200,8 +238,13 @@ export function AdminPanel() {
     []
   );
 
-  const getCourseName = (course: { name: string; nameTr: string }) =>
-    language === "tr" ? course.nameTr : course.name;
+  const getCourseName = (course: { id: string; name: string; nameTr: string }) => {
+    const override = adminState?.courseNameOverrides[course.id];
+    if (override) {
+      return language === "tr" ? override.nameTr : override.name;
+    }
+    return language === "tr" ? course.nameTr : course.name;
+  };
 
   if (!adminState) {
     return (
@@ -246,6 +289,20 @@ export function AdminPanel() {
                   {t.incorrectPassword}
                 </p>
               )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="remember-me"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(!!checked)}
+                className="h-4 w-4"
+              />
+              <Label
+                htmlFor="remember-me"
+                className="text-sm cursor-pointer select-none"
+              >
+                {t.rememberMe}
+              </Label>
             </div>
             <Button
               onClick={handleAuthenticate}
@@ -392,21 +449,46 @@ export function AdminPanel() {
                       <Card key={course.id} className="border">
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <CardTitle className="text-base">
-                                {getCourseName(course)}
-                              </CardTitle>
-                              <p className="text-xs text-muted-foreground">
-                                {course.code} • {course.credits} {t.creditAbbr}
+                            <div className="flex-1 min-w-0 space-y-2">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                <div>
+                                  <Label className="text-[10px] text-muted-foreground">{t.courseCode}</Label>
+                                  <Input
+                                    value={adminState.courseNameOverrides[course.id]?.code ?? course.code}
+                                    onChange={(e) => handleCourseNameChange(course.id, "code", e.target.value)}
+                                    className="h-8 text-xs font-mono"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-[10px] text-muted-foreground">{t.courseNameEN}</Label>
+                                  <Input
+                                    value={adminState.courseNameOverrides[course.id]?.name ?? course.name}
+                                    onChange={(e) => handleCourseNameChange(course.id, "name", e.target.value)}
+                                    className="h-8 text-xs"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-[10px] text-muted-foreground">{t.courseNameTR}</Label>
+                                  <Input
+                                    value={adminState.courseNameOverrides[course.id]?.nameTr ?? course.nameTr}
+                                    onChange={(e) => handleCourseNameChange(course.id, "nameTr", e.target.value)}
+                                    className="h-8 text-xs"
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="secondary" className="text-[10px] font-mono px-1.5 py-0">
+                                  {course.credits} AKTS
+                                </Badge>
                                 {course.isElective && (
                                   <Badge
                                     variant="secondary"
-                                    className="ml-2 text-[10px]"
+                                    className="text-[10px]"
                                   >
                                     {t.elective}
                                   </Badge>
                                 )}
-                              </p>
+                              </div>
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
                               <Badge

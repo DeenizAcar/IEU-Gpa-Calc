@@ -98,7 +98,16 @@ export interface Translations {
 
   // ─── Not Taken ─────────────────────────────────────────────────
   notTakingCourse: string;
+  // ─── Remember Me ───────────────────────────────────────────
+  rememberMe: string;
 
+  // ─── Course Name Editing ────────────────────────────────────
+  courseCode: string;
+  courseNameEN: string;
+  courseNameTR: string;
+
+  // ─── Dynamic AKTS ──────────────────────────────────────────
+  enterAkts: string;
   // ─── Footer ────────────────────────────────────────────────────
   footerText: string;
 }
@@ -201,7 +210,16 @@ export const tr: Translations = {
 
   // ─── Not Taken ─────────────────────────────────────────────────────
   notTakingCourse: "Bu dersi almıyorum",
+  // ─── Remember Me ───────────────────────────────────────────
+  rememberMe: "Beni Hatırla",
 
+  // ─── Course Name Editing ────────────────────────────────────
+  courseCode: "Ders Kodu",
+  courseNameEN: "Ders Adı (EN)",
+  courseNameTR: "Ders Adı (TR)",
+
+  // ─── Dynamic AKTS ──────────────────────────────────────────
+  enterAkts: "AKTS Giriniz",
   // ─── Footer ────────────────────────────────────────────────────
   footerText: "Deniz Acar",
 };
@@ -304,7 +322,16 @@ export const en: Translations = {
 
   // ─── Not Taken ─────────────────────────────────────────────────────
   notTakingCourse: "I am not taking this course",
+  // ─── Remember Me ───────────────────────────────────────────
+  rememberMe: "Remember Me",
 
+  // ─── Course Name Editing ────────────────────────────────────
+  courseCode: "Course Code",
+  courseNameEN: "Course Name (EN)",
+  courseNameTR: "Course Name (TR)",
+
+  // ─── Dynamic AKTS ──────────────────────────────────────────
+  enterAkts: "Enter ECTS",
   // ─── Footer ────────────────────────────────────────────────────
   footerText: "Deniz Acar",
 };

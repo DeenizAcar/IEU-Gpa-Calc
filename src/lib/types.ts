@@ -41,6 +41,7 @@ export interface SemesterGPA {
 
 export interface AdminState {
   courseConfigs: Record<string, CourseConfig>;
+  courseNameOverrides: Record<string, { name: string; nameTr: string; code: string }>;
   deletedCourses: string[];
   isLocked: boolean;
   password: string;
@@ -50,6 +51,7 @@ export interface StudentState {
   courseGrades: Record<string, CourseGrade>;
   selectedElectives: string[];
   notTakenCourses: string[];
+  customAkts: Record<string, number>;
 }
 
 export type ThemeMode = "dark" | "light" | "high-contrast";

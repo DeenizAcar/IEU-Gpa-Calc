@@ -31,6 +31,9 @@ interface GradeCardProps {
   isTaken: boolean;
   onScoreChange: (courseId: string, fieldId: string, value: number) => void;
   onTakenChange: (courseId: string, isTaken: boolean) => void;
+  customAkts?: number;
+  onAktsChange?: (courseId: string, value: number) => void;
+  nameOverride?: { name: string; nameTr: string; code: string };
 }
 
 export function GradeCard({
@@ -41,6 +44,9 @@ export function GradeCard({
   isTaken,
   onScoreChange,
   onTakenChange,
+  customAkts,
+  onAktsChange,
+  nameOverride,
 }: GradeCardProps) {
   const { language, t } = useLanguage();
 
@@ -53,7 +59,11 @@ export function GradeCard({
 
   const hasAnyScore = Object.values(scores).some((s) => s > 0);
 
-  const courseName = language === "tr" ? course.nameTr : course.name;
+  const courseName = nameOverride
+    ? (language === "tr" ? nameOverride.nameTr : nameOverride.name)
+    : (language === "tr" ? course.nameTr : course.name);
+  const courseCode = nameOverride?.code ?? course.code;
+  const displayCredits = customAkts ?? course.credits;
 
   const handleInputChange = useCallback(
     (fieldId: string, value: string) => {
@@ -98,11 +108,31 @@ export function GradeCard({
             </CardTitle>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               <Badge variant="outline" className="text-[11px] font-mono px-1.5 py-0">
-                {course.code}
+                {courseCode}
               </Badge>
-              <Badge variant="secondary" className="text-[11px] font-mono px-1.5 py-0">
-                {course.credits} AKTS
-              </Badge>
+              {course.isElective && onAktsChange ? (
+                <div className="flex items-center gap-1">
+                  <Badge variant="secondary" className="text-[11px] font-mono px-1.5 py-0">
+                    AKTS:
+                  </Badge>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={30}
+                    value={displayCredits}
+                    onChange={(e) => {
+                      const v = Math.max(1, Math.min(30, parseInt(e.target.value) || 1));
+                      onAktsChange(course.id, v);
+                    }}
+                    className="w-14 h-6 text-[11px] text-center font-mono px-1 py-0"
+                    title={t.enterAkts}
+                  />
+                </div>
+              ) : (
+                <Badge variant="secondary" className="text-[11px] font-mono px-1.5 py-0">
+                  {displayCredits} AKTS
+                </Badge>
+              )}
               {course.isElective && (
                 <Badge variant="secondary" className="text-[11px] px-1.5 py-0">
                   {t.elective}

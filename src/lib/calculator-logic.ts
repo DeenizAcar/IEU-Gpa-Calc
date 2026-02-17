@@ -107,15 +107,19 @@ export function calculateCourseGrade(
 /**
  * Calculate semester GPA.
  */
-export function calculateSemesterGPA(courseGrades: CourseGrade[]): number {
+export function calculateSemesterGPA(
+  courseGrades: CourseGrade[],
+  customAkts?: Record<string, number>
+): number {
   let totalPoints = 0;
   let totalCredits = 0;
 
   for (const grade of courseGrades) {
     const course = COURSES.find((c) => c.id === grade.courseId);
     if (!course) continue;
-    totalPoints += grade.gradePoint * course.credits;
-    totalCredits += course.credits;
+    const credits = customAkts?.[grade.courseId] ?? course.credits;
+    totalPoints += grade.gradePoint * credits;
+    totalCredits += credits;
   }
 
   if (totalCredits === 0) return 0;
@@ -126,7 +130,8 @@ export function calculateSemesterGPA(courseGrades: CourseGrade[]): number {
  * Calculate cumulative GPA across all semesters.
  */
 export function calculateCumulativeGPA(
-  allGrades: CourseGrade[]
+  allGrades: CourseGrade[],
+  customAkts?: Record<string, number>
 ): { gpa: number; totalCredits: number; totalPoints: number } {
   let totalPoints = 0;
   let totalCredits = 0;
@@ -134,8 +139,9 @@ export function calculateCumulativeGPA(
   for (const grade of allGrades) {
     const course = COURSES.find((c) => c.id === grade.courseId);
     if (!course) continue;
-    totalPoints += grade.gradePoint * course.credits;
-    totalCredits += course.credits;
+    const credits = customAkts?.[grade.courseId] ?? course.credits;
+    totalPoints += grade.gradePoint * credits;
+    totalCredits += credits;
   }
 
   const gpa = totalCredits > 0 ? Math.round((totalPoints / totalCredits) * 100) / 100 : 0;

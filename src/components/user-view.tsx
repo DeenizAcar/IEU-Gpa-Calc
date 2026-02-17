@@ -46,6 +46,7 @@ export function UserView() {
   const [adminState, setAdminState] = useState<AdminState | null>(null);
   const [scores, setScores] = useState<Record<string, Record<string, number>>>({});
   const [notTakenCourses, setNotTakenCourses] = useState<Set<string>>(new Set());
+  const [customAkts, setCustomAkts] = useState<Record<string, number>>({});
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   // Load persisted data on mount
@@ -65,9 +66,14 @@ export function UserView() {
     if (student.notTakenCourses) {
       setNotTakenCourses(new Set(student.notTakenCourses));
     }
+
+    // Load customAkts
+    if (student.customAkts) {
+      setCustomAkts(student.customAkts);
+    }
   }, []);
 
-  // Save whenever scores or notTakenCourses change
+  // Save whenever scores, notTakenCourses, or customAkts change
   useEffect(() => {
     if (!adminState) return;
 
@@ -84,8 +90,9 @@ export function UserView() {
       courseGrades,
       selectedElectives: [],
       notTakenCourses: Array.from(notTakenCourses),
+      customAkts,
     });
-  }, [scores, adminState, notTakenCourses]);
+  }, [scores, adminState, notTakenCourses, customAkts]);
 
   const handleScoreChange = useCallback(
     (courseId: string, fieldId: string, value: number) => {
@@ -115,10 +122,18 @@ export function UserView() {
     []
   );
 
+  const handleAktsChange = useCallback(
+    (courseId: string, value: number) => {
+      setCustomAkts((prev) => ({ ...prev, [courseId]: value }));
+    },
+    []
+  );
+
   const handleReset = useCallback(() => {
     resetStudentState();
     setScores({});
     setNotTakenCourses(new Set());
+    setCustomAkts({});
     setResetDialogOpen(false);
   }, []);
 
@@ -140,8 +155,8 @@ export function UserView() {
   }, [scores, adminState, notTakenCourses]);
 
   const { gpa: cumulativeGPA, totalCredits } = useMemo(
-    () => calculateCumulativeGPA(allGrades),
-    [allGrades]
+    () => calculateCumulativeGPA(allGrades, customAkts),
+    [allGrades, customAkts]
   );
 
   const semesterGPAs = useMemo(() => {
@@ -152,11 +167,11 @@ export function UserView() {
       });
       return {
         semester: getSemesterLabel(sem, language),
-        gpa: calculateSemesterGPA(semGrades),
+        gpa: calculateSemesterGPA(semGrades, customAkts),
         count: semGrades.length,
       };
     }).filter((s) => s.count > 0);
-  }, [allGrades, language]);
+  }, [allGrades, language, customAkts]);
 
   if (!adminState) {
     return (
@@ -254,7 +269,7 @@ export function UserView() {
             const course = COURSES.find((c) => c.id === g.courseId);
             return course?.semester === sem;
           });
-          const semGPA = calculateSemesterGPA(semGrades);
+          const semGPA = calculateSemesterGPA(semGrades, customAkts);
 
           return (
             <TabsContent key={sem} value={sem} className="space-y-4 mt-4">
@@ -295,8 +310,9 @@ export function UserView() {
                       cumulativeGPA={cumulativeGPA}
                       isTaken={isTaken}
                       onScoreChange={handleScoreChange}
-                      onTakenChange={handleTakenChange}
-                    />
+                      onTakenChange={handleTakenChange}                      customAkts={customAkts[course.id]}
+                      onAktsChange={handleAktsChange}
+                      nameOverride={adminState.courseNameOverrides[course.id]}                    />
                   );
                 })}
               </div>

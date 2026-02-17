@@ -13,12 +13,14 @@ export const DEFAULT_WEIGHT_FIELDS: WeightField[] = [
 // ─── Per-Course Default Weights (Admin-Exported) ──────────────────────
 export const DEFAULT_COURSE_WEIGHTS: Record<string, WeightField[]> = {
   "s11-ieu110": [
-    { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 40 },
+    { id: "midterm", label: "Quiz 1", labelTr: "Küçük Sınav 1", percentage: 20 },
     { id: "final", label: "Final", labelTr: "Final", percentage: 60 },
+    { id: "custom-1771336249655", label: "Quiz 2", labelTr: "Küçük Sınav 2", percentage: 20 },
   ],
   "s11-ing101": [
-    { id: "midterm", label: "Modals", labelTr: "Modüller", percentage: 60 },
+    { id: "midterm", label: "Quiz 1", labelTr: "Küçük Sınav 1", percentage: 30 },
     { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
+    { id: "custom-1771336303312", label: "Quiz 2", labelTr: "Küçük Sınav 2", percentage: 30 },
   ],
   "s11-mbp101": [
     { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 30 },

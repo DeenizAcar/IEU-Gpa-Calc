@@ -18,6 +18,7 @@ export function getDefaultAdminState(): AdminState {
 
   return {
     courseConfigs,
+    courseNameOverrides: {},
     deletedCourses: [],
     isLocked: false,
     password: "admin123", // Default password
@@ -34,6 +35,7 @@ export function loadAdminState(): AdminState {
       const parsed = JSON.parse(stored) as AdminState;
       // Ensure deletedCourses exists (backward compat)
       if (!parsed.deletedCourses) parsed.deletedCourses = [];
+      if (!parsed.courseNameOverrides) parsed.courseNameOverrides = {};
       // Merge with defaults to handle new courses added
       const defaults = getDefaultAdminState();
       for (const courseId of Object.keys(defaults.courseConfigs)) {
@@ -65,6 +67,7 @@ export function getDefaultStudentState(): StudentState {
     courseGrades: {},
     selectedElectives: [],
     notTakenCourses: [],
+    customAkts: {},
   };
 }
 
