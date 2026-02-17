@@ -48,6 +48,7 @@ export interface AdminState {
 export interface StudentState {
   courseGrades: Record<string, CourseGrade>;
   selectedElectives: string[];
+  notTakenCourses: string[];
 }
 
 export type ThemeMode = "dark" | "light" | "high-contrast";

@@ -45,6 +45,7 @@ export function UserView() {
   const { language, t } = useLanguage();
   const [adminState, setAdminState] = useState<AdminState | null>(null);
   const [scores, setScores] = useState<Record<string, Record<string, number>>>({});
+  const [notTakenCourses, setNotTakenCourses] = useState<Set<string>>(new Set());
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   // Load persisted data on mount
@@ -59,9 +60,14 @@ export function UserView() {
       reconstructed[courseId] = { ...grade.scores };
     }
     setScores(reconstructed);
+
+    // Load notTakenCourses
+    if (student.notTakenCourses) {
+      setNotTakenCourses(new Set(student.notTakenCourses));
+    }
   }, []);
 
-  // Save whenever scores change
+  // Save whenever scores or notTakenCourses change
   useEffect(() => {
     if (!adminState) return;
 
@@ -74,8 +80,12 @@ export function UserView() {
       courseGrades[courseId] = calculateCourseGrade(courseId, courseScores, config);
     }
 
-    saveStudentState({ courseGrades, selectedElectives: [] });
-  }, [scores, adminState]);
+    saveStudentState({
+      courseGrades,
+      selectedElectives: [],
+      notTakenCourses: Array.from(notTakenCourses),
+    });
+  }, [scores, adminState, notTakenCourses]);
 
   const handleScoreChange = useCallback(
     (courseId: string, fieldId: string, value: number) => {
@@ -90,17 +100,35 @@ export function UserView() {
     []
   );
 
+  const handleTakenChange = useCallback(
+    (courseId: string, isTaken: boolean) => {
+      setNotTakenCourses((prev) => {
+        const next = new Set(prev);
+        if (isTaken) {
+          next.delete(courseId);
+        } else {
+          next.add(courseId);
+        }
+        return next;
+      });
+    },
+    []
+  );
+
   const handleReset = useCallback(() => {
     resetStudentState();
     setScores({});
+    setNotTakenCourses(new Set());
     setResetDialogOpen(false);
   }, []);
 
-  // ─── Computed GPA values ───────────────────────────────────────────
+  // ─── Computed GPA values (excluding notTaken courses) ──────────────
   const allGrades = useMemo(() => {
     if (!adminState) return [];
     const grades: CourseGrade[] = [];
     for (const [courseId, courseScores] of Object.entries(scores)) {
+      // Exclude courses not being taken
+      if (notTakenCourses.has(courseId)) continue;
       const config = adminState.courseConfigs[courseId];
       if (!config) continue;
       const hasScore = Object.values(courseScores).some((s) => s > 0);
@@ -108,7 +136,7 @@ export function UserView() {
       grades.push(calculateCourseGrade(courseId, courseScores, config));
     }
     return grades;
-  }, [scores, adminState]);
+  }, [scores, adminState, notTakenCourses]);
 
   const { gpa: cumulativeGPA, totalCredits } = useMemo(
     () => calculateCumulativeGPA(allGrades),
@@ -199,12 +227,12 @@ export function UserView() {
 
       {/* Semester Tabs */}
       <Tabs defaultValue="1.1" className="w-full">
-        <TabsList className="w-full grid grid-cols-4 h-auto gap-1 bg-muted p-1 rounded-lg">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full h-auto gap-1 bg-muted p-1 rounded-lg">
           {SEMESTERS.map((sem) => (
             <TabsTrigger
               key={sem}
               value={sem}
-              className="min-h-[44px] px-2 py-2.5 text-xs sm:text-sm font-medium text-center leading-tight whitespace-normal rounded-md data-[state=active]:font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+              className="w-full min-h-[44px] px-3 py-2.5 text-xs sm:text-sm font-medium text-center leading-tight whitespace-normal rounded-md data-[state=active]:font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
             >
               {getSemesterLabel(sem, language)}
             </TabsTrigger>
@@ -247,6 +275,8 @@ export function UserView() {
                   );
                   if (!hasActiveWeights) return null;
 
+                  const isTaken = !notTakenCourses.has(course.id);
+
                   return (
                     <GradeCard
                       key={course.id}
@@ -254,7 +284,9 @@ export function UserView() {
                       weights={config.weights}
                       scores={scores[course.id] || {}}
                       cumulativeGPA={cumulativeGPA}
+                      isTaken={isTaken}
                       onScoreChange={handleScoreChange}
+                      onTakenChange={handleTakenChange}
                     />
                   );
                 })}

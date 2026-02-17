@@ -86,6 +86,9 @@ export interface Translations {
   semester2Fall: string;
   semester2Spring: string;
 
+  // ─── Not Taken ─────────────────────────────────────────────────
+  notTakingCourse: string;
+
   // ─── Footer ────────────────────────────────────────────────────
   footerText: string;
 }
@@ -94,8 +97,8 @@ export const tr: Translations = {
   // ─── Common ─────────────────────────────────────────────────────
   loading: "Yükleniyor…",
   cancel: "İptal",
-  credits: "Kredi",
-  creditAbbr: "kr",
+  credits: "AKTS",
+  creditAbbr: "AKTS",
   courses: "ders",
   elective: "Seçmeli",
   passed: "Geçti",
@@ -129,8 +132,8 @@ export const tr: Translations = {
 
   // ─── GPA Summary ───────────────────────────────────────────────
   cumulativeGPA: "Genel GNO",
-  totalCredits: "Toplam Kredi",
-  creditHours: "kredi saati",
+  totalCredits: "Toplam AKTS",
+  creditHours: "AKTS",
   coursesGraded: "Notlandırılan Ders",
   bestSemester: "En İyi Dönem",
 
@@ -176,6 +179,9 @@ export const tr: Translations = {
   semester2Fall: "2. Sene 1. Dönem",
   semester2Spring: "2. Sene 2. Dönem",
 
+  // ─── Not Taken ─────────────────────────────────────────────────────
+  notTakingCourse: "Bu dersi almıyorum",
+
   // ─── Footer ────────────────────────────────────────────────────
   footerText: "Deniz Acar",
 };
@@ -184,8 +190,8 @@ export const en: Translations = {
   // ─── Common ─────────────────────────────────────────────────────
   loading: "Loading…",
   cancel: "Cancel",
-  credits: "Credits",
-  creditAbbr: "cr",
+  credits: "ECTS",
+  creditAbbr: "ECTS",
   courses: "courses",
   elective: "Elective",
   passed: "Passed",
@@ -219,8 +225,8 @@ export const en: Translations = {
 
   // ─── GPA Summary ───────────────────────────────────────────────
   cumulativeGPA: "Cumulative GPA",
-  totalCredits: "Total Credits",
-  creditHours: "credit hours",
+  totalCredits: "Total ECTS",
+  creditHours: "ECTS",
   coursesGraded: "Courses Graded",
   bestSemester: "Best Semester",
 
@@ -265,6 +271,9 @@ export const en: Translations = {
   semester1Spring: "Year 1 Spring",
   semester2Fall: "Year 2 Fall",
   semester2Spring: "Year 2 Spring",
+
+  // ─── Not Taken ─────────────────────────────────────────────────────
+  notTakingCourse: "I am not taking this course",
 
   // ─── Footer ────────────────────────────────────────────────────
   footerText: "Deniz Acar",

@@ -60,6 +60,7 @@ export function getDefaultStudentState(): StudentState {
   return {
     courseGrades: {},
     selectedElectives: [],
+    notTakenCourses: [],
   };
 }
 

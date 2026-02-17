@@ -23,7 +23,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { AdminState, WeightField } from "@/lib/types";
-import { COURSES, SEMESTERS, ELECTIVE_COURSES, getSemesterLabel } from "@/lib/course-data";
+import { COURSES, SEMESTERS, getSemesterLabel } from "@/lib/course-data";
 import { loadAdminState, saveAdminState, resetAdminState } from "@/lib/storage";
 import {
   Plus,
@@ -459,42 +459,6 @@ export function AdminPanel() {
           );
         })}
 
-        {/* Elective Pool */}
-        <AccordionItem
-          value="electives"
-          className="border rounded-lg px-4"
-        >
-          <AccordionTrigger className="hover:no-underline py-4">
-            <div className="flex items-center gap-3">
-              <BookOpen className="h-5 w-5 text-primary" />
-              <div className="text-left">
-                <span className="font-semibold">{t.electiveCoursePool}</span>
-                <span className="text-sm text-muted-foreground ml-2">
-                  ({ELECTIVE_COURSES.length} {t.courses})
-                </span>
-              </div>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3 pb-4">
-              {ELECTIVE_COURSES.map((course) => (
-                <Card key={course.id} className="border p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm">{getCourseName(course)}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {course.code} • {course.credits} {t.credits}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="text-xs">
-                      {language === "tr" ? course.name : course.nameTr}
-                    </Badge>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
       </Accordion>
     </div>
   );
