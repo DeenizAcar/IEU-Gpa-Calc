@@ -240,7 +240,12 @@ export function UserView() {
         </TabsList>
 
         {SEMESTERS.map((sem) => {
-          const semCourses = getCoursesBySemester(sem);
+          const semCourses = getCoursesBySemester(sem).sort((a, b) => {
+            if (b.credits !== a.credits) return b.credits - a.credits;
+            const nameA = language === "tr" ? a.nameTr : a.name;
+            const nameB = language === "tr" ? b.nameTr : b.name;
+            return nameA.localeCompare(nameB);
+          });
           const semGrades = allGrades.filter((g) => {
             const course = COURSES.find((c) => c.id === g.courseId);
             return course?.semester === sem;

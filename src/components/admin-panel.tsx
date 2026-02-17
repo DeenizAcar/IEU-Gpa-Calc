@@ -36,6 +36,7 @@ import {
   AlertTriangle,
   CheckCircle,
   BookOpen,
+  ClipboardCopy,
 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 
@@ -46,6 +47,7 @@ export function AdminPanel() {
   const [passwordInput, setPasswordInput] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saved" | "error">("idle");
+  const [exportStatus, setExportStatus] = useState<"idle" | "copied">("idle");
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   // Load on mount
@@ -82,6 +84,26 @@ export function AdminPanel() {
     setSaveStatus("saved");
     setTimeout(() => setSaveStatus("idle"), 2000);
   }, []);
+
+  const handleExportConfig = useCallback(() => {
+    if (!adminState) return;
+    const exportData: Record<string, { weights: WeightField[] }> = {};
+    for (const [courseId, config] of Object.entries(adminState.courseConfigs)) {
+      exportData[courseId] = {
+        weights: config.weights.map((w) => ({
+          id: w.id,
+          label: w.label,
+          labelTr: w.labelTr,
+          percentage: w.percentage,
+        })),
+      };
+    }
+    const json = JSON.stringify(exportData, null, 2);
+    navigator.clipboard.writeText(json).then(() => {
+      setExportStatus("copied");
+      setTimeout(() => setExportStatus("idle"), 3000);
+    });
+  }, [adminState]);
 
   const updateWeight = useCallback(
     (courseId: string, weightId: string, field: keyof WeightField, value: string | number) => {
@@ -283,6 +305,24 @@ export function AdminPanel() {
               <>
                 <Save className="h-4 w-4 mr-2" />
                 {t.saveConfig}
+              </>
+            )}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={handleExportConfig}
+            className="h-11 min-h-[44px]"
+            disabled={exportStatus === "copied"}
+          >
+            {exportStatus === "copied" ? (
+              <>
+                <CheckCircle className="h-4 w-4 mr-2" />
+                {t.configCopied}
+              </>
+            ) : (
+              <>
+                <ClipboardCopy className="h-4 w-4 mr-2" />
+                {t.exportConfigJson}
               </>
             )}
           </Button>

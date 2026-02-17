@@ -80,6 +80,10 @@ export interface Translations {
   addCustomField: string;
   electiveCoursePool: string;
 
+  // ─── Export Config ──────────────────────────────────────────────
+  exportConfigJson: string;
+  configCopied: string;
+
   // ─── Semester Labels ────────────────────────────────────────────
   semester1Fall: string;
   semester1Spring: string;
@@ -173,6 +177,10 @@ export const tr: Translations = {
   addCustomField: "Özel Alan Ekle",
   electiveCoursePool: "Seçmeli Ders Havuzu",
 
+  // ─── Export Config ──────────────────────────────────────────────
+  exportConfigJson: "Yapılandırmayı Koda Aktar (Export JSON)",
+  configCopied: "JSON panoya kopyalandı!",
+
   // ─── Semester Labels ────────────────────────────────────────────
   semester1Fall: "1. Sene 1. Dönem",
   semester1Spring: "1. Sene 2. Dönem",
@@ -265,6 +273,10 @@ export const en: Translations = {
   weightPercent: "Weight %",
   addCustomField: "Add Custom Field",
   electiveCoursePool: "Elective Course Pool",
+
+  // ─── Export Config ──────────────────────────────────────────────
+  exportConfigJson: "Export Config to Code (Export JSON)",
+  configCopied: "JSON copied to clipboard!",
 
   // ─── Semester Labels ────────────────────────────────────────────
   semester1Fall: "Year 1 Fall",
