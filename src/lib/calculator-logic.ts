@@ -172,12 +172,12 @@ export function groupBySemester(courseGrades: CourseGrade[]): SemesterGPA[] {
  * Get GPA classification label.
  */
 export function getGPALabel(gpa: number): string {
-  if (gpa >= 3.5) return "Honor Student 🏆";
-  if (gpa >= 3.0) return "High Standing ⭐";
-  if (gpa >= 2.5) return "Good Standing ✅";
-  if (gpa >= 2.0) return "Satisfactory 📊";
-  if (gpa >= 1.0) return "Conditional ⚠️";
-  return "Academic Probation 🚨";
+  if (gpa >= 3.5) return "Honor Student";
+  if (gpa >= 3.0) return "High Standing";
+  if (gpa >= 2.5) return "Good Standing";
+  if (gpa >= 2.0) return "Satisfactory";
+  if (gpa >= 1.0) return "Conditional";
+  return "Academic Probation";
 }
 
 /**

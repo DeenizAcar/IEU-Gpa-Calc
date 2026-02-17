@@ -198,15 +198,14 @@ export function UserView() {
 
       {/* Semester Tabs */}
       <Tabs defaultValue="1.1" className="w-full">
-        <TabsList className="w-full grid grid-cols-4 h-12">
+        <TabsList className="w-full grid grid-cols-4 h-auto gap-1 bg-muted p-1 rounded-lg">
           {SEMESTERS.map((sem) => (
             <TabsTrigger
               key={sem}
               value={sem}
-              className="min-h-[44px] text-sm data-[state=active]:font-bold"
+              className="min-h-[44px] px-2 py-2.5 text-xs sm:text-sm font-medium text-center leading-tight whitespace-normal rounded-md data-[state=active]:font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
             >
-              <span className="hidden sm:inline">{SEMESTER_LABELS[sem]?.split("—")[0]}</span>
-              <span className="sm:hidden">{sem}</span>
+              {SEMESTER_LABELS[sem]}
             </TabsTrigger>
           ))}
         </TabsList>

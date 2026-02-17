@@ -6,9 +6,9 @@ A **Progressive Web App (PWA)** for Izmir University of Economics Computer Progr
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)
 
-## ✨ Features
+## Features
 
-### 🎓 Student Mode
+### Student Mode
 - **Semester-organized courses** (1.1, 1.2, 2.1, 2.2)
 - **Dynamic grade inputs** with both numeric fields and sliders (0–100)
 - **IUE Grading Engine** — maps scores to: AA, BA, BB, CB, CC, DC, DD, FD, FF
@@ -16,7 +16,7 @@ A **Progressive Web App (PWA)** for Izmir University of Economics Computer Progr
 - **Pass/Fail indicators** with DC/DD conditional pass logic (GPA ≥ 2.00)
 - **Persistent scores** saved to LocalStorage
 
-### ⚙️ Admin Mode
+### Admin Mode
 - **Password-protected** configuration panel
 - **Per-course weight editor** — Midterm, Final, Project, Homework, Participation
 - **Custom fields** — Add unlimited weight categories with the "+" button
@@ -24,18 +24,18 @@ A **Progressive Web App (PWA)** for Izmir University of Economics Computer Progr
 - **Apply to All** — Copy one course's weights to all others
 - **Persistent config** saved to LocalStorage
 
-### 🎨 Accessibility & Themes
+### Accessibility & Themes
 - **Dark Mode** (default), **Light Mode**, and **High-Contrast** (B&W)
 - **44×44px minimum touch targets** for mobile accessibility
 - **Focus indicators** and keyboard navigation
 - **Mobile-first** responsive design
 
-### 📱 PWA Support
+### PWA Support
 - Installable on iOS & Android
 - Offline-capable with service worker caching
 - Web app manifest for native-like experience
 
-## 🚀 Getting Started
+## Getting Started
 
 ```bash
 # Install dependencies
@@ -53,7 +53,7 @@ npm start
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -80,7 +80,7 @@ src/
     └── utils.ts            # Utility functions
 ```
 
-## 📊 IUE Grading Scale
+## IUE Grading Scale
 
 | Grade | Points | Score Range |
 |-------|--------|-------------|
@@ -96,7 +96,7 @@ src/
 
 > **Note:** DC and DD grades require cumulative GPA ≥ 2.00 to pass.
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Framework:** Next.js 16 (App Router)
 - **Styling:** Tailwind CSS 4

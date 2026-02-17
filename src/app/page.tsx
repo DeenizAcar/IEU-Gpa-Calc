@@ -17,13 +17,14 @@ export default function Home() {
       </main>
 
       <footer className="border-t py-4">
-        <div className="container max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-muted-foreground">
-          <p>
-            IUE Computer Programming — GPA Calculator
-          </p>
-          <p>
-            Built with Next.js, Tailwind CSS & Shadcn UI
-          </p>
+        <div className="container max-w-6xl mx-auto px-4 text-center text-sm text-muted-foreground">
+          Deniz Acar |{" "}
+          <a
+            href="mailto:2008denizacar@gmail.com"
+            className="hover:text-foreground transition-colors"
+          >
+            2008denizacar@gmail.com
+          </a>
         </div>
       </footer>
     </div>

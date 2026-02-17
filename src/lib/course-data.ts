@@ -373,10 +373,10 @@ export const ELECTIVE_COURSES: Course[] = [
 
 // ─── Semester Labels ──────────────────────────────────────────────────
 export const SEMESTER_LABELS: Record<string, string> = {
-  "1.1": "Year 1 — Fall Semester",
-  "1.2": "Year 1 — Spring Semester",
-  "2.1": "Year 2 — Fall Semester",
-  "2.2": "Year 2 — Spring Semester",
+  "1.1": "1. Sene 1. D\u00f6nem",
+  "1.2": "1. Sene 2. D\u00f6nem",
+  "2.1": "2. Sene 1. D\u00f6nem",
+  "2.2": "2. Sene 2. D\u00f6nem",
 };
 
 export const SEMESTERS = ["1.1", "1.2", "2.1", "2.2"] as const;
