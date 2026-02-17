@@ -84,6 +84,12 @@ export interface Translations {
   exportConfigJson: string;
   configCopied: string;
 
+  // ─── Course Deletion ───────────────────────────────────────────
+  deletedCoursesSection: string;
+  restoreCourse: string;
+  deleteCourse: string;
+  noDeletedCourses: string;
+
   // ─── Semester Labels ────────────────────────────────────────────
   semester1Fall: string;
   semester1Spring: string;
@@ -181,6 +187,12 @@ export const tr: Translations = {
   exportConfigJson: "Yapılandırmayı Koda Aktar (Export JSON)",
   configCopied: "JSON panoya kopyalandı!",
 
+  // ─── Course Deletion ───────────────────────────────────────────
+  deletedCoursesSection: "Silinen Dersler",
+  restoreCourse: "Geri Yükle",
+  deleteCourse: "Dersi Sil",
+  noDeletedCourses: "Silinen ders bulunmuyor.",
+
   // ─── Semester Labels ────────────────────────────────────────────
   semester1Fall: "1. Sene 1. Dönem",
   semester1Spring: "1. Sene 2. Dönem",
@@ -277,6 +289,12 @@ export const en: Translations = {
   // ─── Export Config ──────────────────────────────────────────────
   exportConfigJson: "Export Config to Code (Export JSON)",
   configCopied: "JSON copied to clipboard!",
+
+  // ─── Course Deletion ───────────────────────────────────────────
+  deletedCoursesSection: "Deleted Courses",
+  restoreCourse: "Restore",
+  deleteCourse: "Delete Course",
+  noDeletedCourses: "No deleted courses.",
 
   // ─── Semester Labels ────────────────────────────────────────────
   semester1Fall: "Year 1 Fall",

@@ -127,8 +127,9 @@ export function UserView() {
     if (!adminState) return [];
     const grades: CourseGrade[] = [];
     for (const [courseId, courseScores] of Object.entries(scores)) {
-      // Exclude courses not being taken
+      // Exclude deleted or not-taken courses
       if (notTakenCourses.has(courseId)) continue;
+      if (adminState.deletedCourses?.includes(courseId)) continue;
       const config = adminState.courseConfigs[courseId];
       if (!config) continue;
       const hasScore = Object.values(courseScores).some((s) => s > 0);
@@ -240,12 +241,15 @@ export function UserView() {
         </TabsList>
 
         {SEMESTERS.map((sem) => {
-          const semCourses = getCoursesBySemester(sem).sort((a, b) => {
-            if (b.credits !== a.credits) return b.credits - a.credits;
-            const nameA = language === "tr" ? a.nameTr : a.name;
-            const nameB = language === "tr" ? b.nameTr : b.name;
-            return nameA.localeCompare(nameB);
-          });
+          const deletedSet = new Set(adminState.deletedCourses || []);
+          const semCourses = getCoursesBySemester(sem)
+            .filter((c) => !deletedSet.has(c.id))
+            .sort((a, b) => {
+              if (b.credits !== a.credits) return b.credits - a.credits;
+              const nameA = language === "tr" ? a.nameTr : a.name;
+              const nameB = language === "tr" ? b.nameTr : b.name;
+              return nameA.localeCompare(nameB);
+            });
           const semGrades = allGrades.filter((g) => {
             const course = COURSES.find((c) => c.id === g.courseId);
             return course?.semester === sem;

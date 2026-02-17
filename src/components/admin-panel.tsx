@@ -37,6 +37,7 @@ import {
   CheckCircle,
   BookOpen,
   ClipboardCopy,
+  Undo2,
 } from "lucide-react";
 import { useLanguage } from "@/components/language-provider";
 
@@ -99,11 +100,31 @@ export function AdminPanel() {
       };
     }
     const json = JSON.stringify(exportData, null, 2);
-    navigator.clipboard.writeText(json).then(() => {
+    const prompt = `I have updated the course configurations in the Admin Panel. Please update the \`course-data.ts\` file and set the following JSON as the NEW DEFAULT values for all users:\n\n${json}`;
+    navigator.clipboard.writeText(prompt).then(() => {
       setExportStatus("copied");
       setTimeout(() => setExportStatus("idle"), 3000);
     });
   }, [adminState]);
+
+  const handleDeleteCourse = useCallback((courseId: string) => {
+    setAdminState((prev) => {
+      if (!prev) return prev;
+      const deleted = prev.deletedCourses || [];
+      if (deleted.includes(courseId)) return prev;
+      return { ...prev, deletedCourses: [...deleted, courseId] };
+    });
+  }, []);
+
+  const handleRestoreCourse = useCallback((courseId: string) => {
+    setAdminState((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        deletedCourses: (prev.deletedCourses || []).filter((id) => id !== courseId),
+      };
+    });
+  }, []);
 
   const updateWeight = useCallback(
     (courseId: string, weightId: string, field: keyof WeightField, value: string | number) => {
@@ -332,8 +353,9 @@ export function AdminPanel() {
       {/* Semester Accordions */}
       <Accordion type="multiple" defaultValue={["1.1"]} className="space-y-4">
         {SEMESTERS.map((semester) => {
+          const deletedSet = new Set(adminState.deletedCourses || []);
           const semesterCourses = COURSES.filter(
-            (c) => c.semester === semester
+            (c) => c.semester === semester && !deletedSet.has(c.id)
           );
           return (
             <AccordionItem
@@ -401,6 +423,15 @@ export function AdminPanel() {
                                 title={t.applyToAllTitle}
                               >
                                 {t.applyToAll}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDeleteCourse(course.id)}
+                                className="h-8 w-8 min-h-[44px] min-w-[44px] text-destructive hover:text-destructive hover:bg-destructive/10"
+                                title={t.deleteCourse}
+                              >
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
@@ -500,6 +531,46 @@ export function AdminPanel() {
         })}
 
       </Accordion>
+
+      {/* Deleted Courses */}
+      {(adminState.deletedCourses?.length ?? 0) > 0 && (
+        <Card className="border-dashed border-destructive/30">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2 text-destructive">
+              <Trash2 className="h-5 w-5" />
+              {t.deletedCoursesSection}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {adminState.deletedCourses.map((courseId) => {
+              const course = COURSES.find((c) => c.id === courseId);
+              if (!course) return null;
+              return (
+                <div
+                  key={courseId}
+                  className="flex items-center justify-between rounded-lg border border-dashed px-3 py-2"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{getCourseName(course)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {course.code} • {course.credits} {t.creditAbbr}
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRestoreCourse(courseId)}
+                    className="h-9 min-h-[44px] gap-1.5"
+                  >
+                    <Undo2 className="h-4 w-4" />
+                    {t.restoreCourse}
+                  </Button>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

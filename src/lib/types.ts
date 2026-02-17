@@ -41,6 +41,7 @@ export interface SemesterGPA {
 
 export interface AdminState {
   courseConfigs: Record<string, CourseConfig>;
+  deletedCourses: string[];
   isLocked: boolean;
   password: string;
 }

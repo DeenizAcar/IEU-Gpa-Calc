@@ -17,6 +17,7 @@ export function getDefaultAdminState(): AdminState {
 
   return {
     courseConfigs,
+    deletedCourses: [],
     isLocked: false,
     password: "admin123", // Default password
   };
@@ -30,6 +31,8 @@ export function loadAdminState(): AdminState {
     const stored = localStorage.getItem(ADMIN_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored) as AdminState;
+      // Ensure deletedCourses exists (backward compat)
+      if (!parsed.deletedCourses) parsed.deletedCourses = [];
       // Merge with defaults to handle new courses added
       const defaults = getDefaultAdminState();
       for (const courseId of Object.keys(defaults.courseConfigs)) {
