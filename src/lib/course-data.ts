@@ -1,7 +1,7 @@
 import { Course, WeightField } from "./types";
 import type { Language } from "./i18n";
 
-// ─── Default Weight Fields ────────────────────────────────────────────
+// ─── Default Weight Fields (fallback) ─────────────────────────────────
 export const DEFAULT_WEIGHT_FIELDS: WeightField[] = [
   { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 30 },
   { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
@@ -9,6 +9,48 @@ export const DEFAULT_WEIGHT_FIELDS: WeightField[] = [
   { id: "homework", label: "Homework", labelTr: "Ödev", percentage: 10 },
   { id: "participation", label: "Participation", labelTr: "Katılım", percentage: 5 },
 ];
+
+// ─── Per-Course Default Weights (Admin-Exported) ──────────────────────
+export const DEFAULT_COURSE_WEIGHTS: Record<string, WeightField[]> = {
+  "s11-ieu110": [
+    { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 40 },
+    { id: "final", label: "Final", labelTr: "Final", percentage: 60 },
+  ],
+  "s11-ing101": [
+    { id: "midterm", label: "Modals", labelTr: "Modüller", percentage: 60 },
+    { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
+  ],
+  "s11-mbp101": [
+    { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 30 },
+    { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
+    { id: "project", label: "Project", labelTr: "Proje", percentage: 20 },
+    { id: "participation", label: "Participation", labelTr: "Katılım", percentage: 10 },
+  ],
+  "s11-mbp191": [
+    { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 20 },
+    { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
+    { id: "project", label: "Project", labelTr: "Proje", percentage: 30 },
+    { id: "participation", label: "Participation", labelTr: "Katılım", percentage: 10 },
+  ],
+  "s11-mbp193": [
+    { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 30 },
+    { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
+    { id: "project", label: "Project", labelTr: "Proje", percentage: 20 },
+    { id: "participation", label: "Participation", labelTr: "Katılım", percentage: 10 },
+  ],
+  "s11-mmat113": [
+    { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 30 },
+    { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
+    { id: "project", label: "Project", labelTr: "Proje", percentage: 20 },
+    { id: "participation", label: "Participation", labelTr: "Katılım", percentage: 10 },
+  ],
+  "s11-trk100": [
+    { id: "midterm", label: "Midterm", labelTr: "Vize", percentage: 30 },
+    { id: "final", label: "Final", labelTr: "Final", percentage: 40 },
+    { id: "project", label: "Quiz 1", labelTr: "Küçük Sınav 1", percentage: 15 },
+    { id: "homework", label: "Quiz 2", labelTr: "Küçük Sınav 2", percentage: 15 },
+  ],
+};
 
 // ─── IUE Computer Programming Course Database (Official Syllabus) ───
 export const COURSES: Course[] = [

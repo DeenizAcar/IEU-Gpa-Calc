@@ -1,5 +1,5 @@
 import { AdminState, CourseConfig, StudentState } from "./types";
-import { COURSES, DEFAULT_WEIGHT_FIELDS } from "./course-data";
+import { COURSES, DEFAULT_WEIGHT_FIELDS, DEFAULT_COURSE_WEIGHTS } from "./course-data";
 
 const ADMIN_STORAGE_KEY = "ieu-gpa-admin";
 const STUDENT_STORAGE_KEY = "ieu-gpa-student";
@@ -9,9 +9,10 @@ export function getDefaultAdminState(): AdminState {
   const courseConfigs: Record<string, CourseConfig> = {};
 
   for (const course of COURSES) {
+    const weights = DEFAULT_COURSE_WEIGHTS[course.id] ?? DEFAULT_WEIGHT_FIELDS;
     courseConfigs[course.id] = {
       courseId: course.id,
-      weights: DEFAULT_WEIGHT_FIELDS.map((w) => ({ ...w })),
+      weights: weights.map((w) => ({ ...w })),
     };
   }
 
