@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ServiceWorkerRegistration } from "@/components/sw-registration";
-import { LanguageProvider } from "@/components/language-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,33 +14,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "IUE GPA Calculator — Computer Programming",
+  title: "Bloody Banana - The Game",
   description:
-    "Professional GPA & Grade Calculator for Izmir University of Economics Computer Programming students. Calculate weighted averages, letter grades, and cumulative GPA with the IUE grading scale.",
+    "Bloody Banana is an action-packed indie game where chaos meets fun. Slice, dash, and survive through waves of enemies in this fast-paced adventure.",
   keywords: [
-    "IUE",
-    "Izmir University of Economics",
-    "GPA Calculator",
-    "Grade Calculator",
-    "Computer Programming",
-    "Bilgisayar Programcılığı",
+    "Bloody Banana",
+    "Indie Game",
+    "Action Game",
+    "Adventure",
+    "Gaming",
   ],
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "IUE GPA Calc",
-  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
-  ],
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({
@@ -52,21 +39,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-      </head>
+    <html lang="en" className="dark scroll-smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background text-foreground`}
       >
         <ThemeProvider>
-          <LanguageProvider>
-            <TooltipProvider delayDuration={300}>
-              <ServiceWorkerRegistration />
-              {children}
-            </TooltipProvider>
-          </LanguageProvider>
+          {children}
         </ThemeProvider>
       </body>
     </html>
